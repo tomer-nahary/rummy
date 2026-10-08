@@ -1,0 +1,78 @@
+import type { GameState, Payment, Player, PlayerSummary, Round } from './types'
+
+export const POINT_VALUE_NIS = 0.01
+
+export function formatNis(points: number): string {
+  return new Intl.NumberFormat('he-IL', {
+    style: 'currency',
+    currency: 'ILS',
+  }).format(points * POINT_VALUE_NIS)
+}
+
+export function computeBalances(players: Player[], rounds: Round[]): Map<string, number> {
+  const balances = new Map<string, number>()
+  for (const p of players) balances.set(p.id, 0)
+  for (const round of rounds) {
+    for (const p of players) {
+      const score = round.scores[p.id]
+      if (typeof score === 'number' && !Number.isNaN(score)) {
+        balances.set(p.id, (balances.get(p.id) ?? 0) + score)
+      }
+    }
+  }
+  return balances
+}
+
+// Higher points = worse: each player pays every player with fewer points
+// the difference between their totals.
+export function computePayments(players: Player[], rounds: Round[]): Payment[] {
+  const balances = computeBalances(players, rounds)
+  const payments: Payment[] = []
+  for (let i = 0; i < players.length; i++) {
+    for (let j = i + 1; j < players.length; j++) {
+      const a = players[i]
+      const b = players[j]
+      const diff = (balances.get(a.id) ?? 0) - (balances.get(b.id) ?? 0)
+      if (diff === 0) continue
+      const worse = diff > 0 ? a : b
+      const better = diff > 0 ? b : a
+      payments.push({ fromId: worse.id, toId: better.id, points: Math.abs(diff) })
+    }
+  }
+  return payments.sort((x, y) => y.points - x.points)
+}
+
+export function computeSummaries(
+  players: Player[],
+  rounds: Round[],
+  payments: Payment[],
+): PlayerSummary[] {
+  const received = new Map<string, number>()
+  const paid = new Map<string, number>()
+  for (const p of players) {
+    received.set(p.id, 0)
+    paid.set(p.id, 0)
+  }
+  for (const payment of payments) {
+    paid.set(payment.fromId, (paid.get(payment.fromId) ?? 0) + payment.points)
+    received.set(payment.toId, (received.get(payment.toId) ?? 0) + payment.points)
+  }
+  const balances = computeBalances(players, rounds)
+  return players.map((player) => {
+    const recv = received.get(player.id) ?? 0
+    const pay = paid.get(player.id) ?? 0
+    return {
+      player,
+      totalPoints: balances.get(player.id) ?? 0,
+      received: recv,
+      paid: pay,
+      net: recv - pay,
+    }
+  })
+}
+
+export function getGameStateSummary(state: GameState) {
+  const payments = computePayments(state.players, state.rounds)
+  const summaries = computeSummaries(state.players, state.rounds, payments)
+  return { payments, summaries }
+}
