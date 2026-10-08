@@ -1,5 +1,5 @@
 import type { GameState } from '../types'
-import { formatNis, getGameStateSummary } from '../settlement'
+import { formatNis, formatNisRounded, getGameStateSummary } from '../settlement'
 
 interface Props {
   state: GameState
@@ -27,7 +27,7 @@ export default function Settlement({ state, onReturnToGame, onNewGame }: Props) 
                   <b>{nameOf(p.fromId)}</b> משלם ל<b>{nameOf(p.toId)}</b>
                 </span>
                 <span className="payment-amount">
-                  {p.points} נק&apos; ({formatNis(p.points)})
+                  {p.points} נק&apos; ({formatNisRounded(p.points)})
                 </span>
               </li>
             ))}

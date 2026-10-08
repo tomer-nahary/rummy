@@ -9,6 +9,16 @@ export function formatNis(points: number): string {
   }).format(points * POINT_VALUE_NIS)
 }
 
+export function formatNisRounded(points: number): string {
+  const whole = Math.round(points * POINT_VALUE_NIS)
+  return new Intl.NumberFormat('he-IL', {
+    style: 'currency',
+    currency: 'ILS',
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+  }).format(whole)
+}
+
 export function computeBalances(players: Player[], rounds: Round[]): Map<string, number> {
   const balances = new Map<string, number>()
   for (const p of players) balances.set(p.id, 0)
