@@ -1,5 +1,11 @@
 import type { GameState } from '../types'
-import { formatNis, formatNisRounded, getGameStateSummary } from '../settlement'
+import {
+  computeSummaries,
+  formatNisRounded,
+  formatNisRoundedSigned,
+  getGameStateSummary,
+  roundToShekelPoints,
+} from '../settlement'
 
 interface Props {
   state: GameState
@@ -8,7 +14,11 @@ interface Props {
 }
 
 export default function Settlement({ state, onReturnToGame, onNewGame }: Props) {
-  const { payments, summaries } = getGameStateSummary(state)
+  const { payments } = getGameStateSummary(state)
+  // Summaries are built from the rounded payments so they add up
+  // exactly like the amounts shown in the payments list.
+  const roundedPayments = payments.map((p) => ({ ...p, points: roundToShekelPoints(p.points) }))
+  const summaries = computeSummaries(state.players, state.rounds, roundedPayments)
   const nameOf = (id: string) => state.players.find((p) => p.id === id)?.name ?? 'שחקן'
 
   return (
@@ -40,10 +50,10 @@ export default function Settlement({ state, onReturnToGame, onNewGame }: Props) 
         <thead>
           <tr>
             <th>שחקן</th>
-            <th>ניקוד</th>
-            <th>מקבל</th>
-            <th>משלם</th>
-            <th>סה&quot;כ</th>
+            <th className="num">ניקוד</th>
+            <th className="num">מקבל</th>
+            <th className="num">משלם</th>
+            <th className="num">סה&quot;כ</th>
           </tr>
         </thead>
         <tbody>
@@ -51,10 +61,10 @@ export default function Settlement({ state, onReturnToGame, onNewGame }: Props) 
             <tr key={s.player.id}>
               <td>{s.player.name}</td>
               <td className="num">{s.totalPoints}</td>
-              <td className="num">{s.received > 0 ? formatNis(s.received) : '-'}</td>
-              <td className="num">{s.paid > 0 ? formatNis(s.paid) : '-'}</td>
+              <td className="num">{s.received > 0 ? formatNisRounded(s.received) : '-'}</td>
+              <td className="num">{s.paid > 0 ? formatNisRounded(s.paid) : '-'}</td>
               <td className={`num ${s.net > 0 ? 'positive' : s.net < 0 ? 'negative' : ''}`}>
-                {s.net === 0 ? '-' : s.net > 0 ? `+${formatNis(s.net)}` : `-${formatNis(-s.net)}`}
+                {s.net === 0 ? '-' : formatNisRoundedSigned(s.net)}
               </td>
             </tr>
           ))}

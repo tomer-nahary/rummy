@@ -19,6 +19,25 @@ export function formatNisRounded(points: number): string {
   }).format(whole)
 }
 
+// Converts points to whole-shekel precision, expressed back in points
+// (e.g. 360 -> 400, i.e. 3.60₪ -> 4₪), so summaries stay consistent
+// with the rounded payment amounts.
+export function roundToShekelPoints(points: number): number {
+  return Math.round(points * POINT_VALUE_NIS) * 100
+}
+
+// Like formatNisRounded, but always shows the sign (+/−) for non-zero values.
+export function formatNisRoundedSigned(points: number): string {
+  const whole = Math.round(points * POINT_VALUE_NIS)
+  return new Intl.NumberFormat('he-IL', {
+    style: 'currency',
+    currency: 'ILS',
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+    signDisplay: 'exceptZero',
+  }).format(whole)
+}
+
 export function computeBalances(players: Player[], rounds: Round[]): Map<string, number> {
   const balances = new Map<string, number>()
   for (const p of players) balances.set(p.id, 0)

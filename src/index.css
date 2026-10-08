@@ -256,8 +256,6 @@ tbody tr:last-child td {
 .num {
   font-variant-numeric: tabular-nums;
   direction: ltr;
-  text-align: left;
-  unicode-bidi: plaintext;
 }
 
 .positive {
