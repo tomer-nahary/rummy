@@ -16,25 +16,29 @@ interface Props {
 
 export default function Settlement({ state, onReturnToGame, onNewGame }: Props) {
   const { payments } = getGameStateSummary(state)
+  // Payments that round to 0₪ are dropped entirely (list and summary).
+  const displayPayments = payments.filter((p) => roundToShekelPoints(p.points) !== 0)
   // Summaries are built from the rounded payments so they add up
   // exactly like the amounts shown in the payments list.
-  const roundedPayments = payments.map((p) => ({ ...p, points: roundToShekelPoints(p.points) }))
-  const summaries = computeSummaries(state.players, state.rounds, roundedPayments)
+  const roundedPayments = displayPayments.map((p) => ({ ...p, points: roundToShekelPoints(p.points) }))
+  const summaries = [...computeSummaries(state.players, state.rounds, roundedPayments)].sort(
+    (a, b) => b.net - a.net,
+  )
   const nameOf = (id: string) => state.players.find((p) => p.id === id)?.name ?? 'שחקן'
 
   return (
     <section className="settlement">
       <h2>חישוב תשלומים</h2>
 
-      {payments.length === 0 ? (
+      {displayPayments.length === 0 ? (
         <p className="hint">כל השחקנים באותו ניקוד - אין תשלומים!</p>
       ) : (
         <>
           <h3>מי משלם למי</h3>
           <ul className="payments-list">
-            {payments.map((p, i) => {
+            {displayPayments.map((p, i) => {
               const isGroupEnd =
-                i < payments.length - 1 && payments[i + 1].fromId !== p.fromId
+                i < displayPayments.length - 1 && displayPayments[i + 1].fromId !== p.fromId
               return (
                 <Fragment key={i}>
                   <li>
