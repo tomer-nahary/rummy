@@ -10,6 +10,27 @@ interface Props {
   onFinishGame: () => void
 }
 
+function PencilIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
+    </svg>
+  )
+}
+
+function TrashIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 6h18" />
+      <path d="M8 6V4h8v2" />
+      <path d="M19 6l-1 14H6L5 6" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+    </svg>
+  )
+}
+
 export default function GameScreen({ state, onUpdateState, onFinishGame }: Props) {
   const [modalRound, setModalRound] = useState<Round | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
@@ -80,25 +101,25 @@ export default function GameScreen({ state, onUpdateState, onFinishGame }: Props
             {state.rounds.map((round, i) => (
               <tr key={round.id}>
                 <td className="round-col">
-                  <span className="round-num">{i + 1}</span>
-                  <span className="round-actions">
+                  <div className="round-cell">
+                    <span className="round-num">{i + 1}</span>
                     <button
                       type="button"
-                      className="btn btn-small"
+                      className="btn btn-icon"
                       onClick={() => editRound(round)}
                       aria-label={`ערוך סבב ${i + 1}`}
                     >
-                      ערוך
+                      <PencilIcon />
                     </button>
                     <button
                       type="button"
-                      className="btn btn-small btn-danger"
+                      className="btn btn-icon btn-icon-danger"
                       onClick={() => deleteRound(round.id)}
                       aria-label={`מחק סבב ${i + 1}`}
                     >
-                      מחק
+                      <TrashIcon />
                     </button>
-                  </span>
+                  </div>
                 </td>
                 {state.players.map((p) => (
                   <td key={p.id} className="num">

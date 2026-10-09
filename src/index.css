@@ -270,12 +270,23 @@ tbody tr:last-child td {
 
 /* Rounds table */
 .table-scroll {
-  overflow-x: auto;
+  overflow: auto;
+  max-height: 60vh;
   margin-top: 12px;
 }
 
 .rounds-table {
   min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.rounds-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 1;
+  box-shadow: inset 0 -1px 0 var(--border);
 }
 
 .rounds-table th,
@@ -284,19 +295,44 @@ tbody tr:last-child td {
 }
 
 .round-col {
-  min-width: 110px;
+  min-width: 0;
+}
+
+.round-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .round-col .round-num {
   font-weight: 600;
   color: var(--primary-dark);
-  display: block;
-  margin-bottom: 4px;
 }
 
-.round-col .round-actions {
-  display: flex;
-  gap: 6px;
+.btn-icon {
+  background: transparent;
+  padding: 4px;
+  color: var(--muted);
+  border-radius: 6px;
+  line-height: 0;
+}
+
+.btn-icon svg {
+  display: block;
+}
+
+.btn-icon:hover:not(:disabled) {
+  background: #e5e0d5;
+  color: var(--text);
+}
+
+.btn-icon-danger {
+  color: var(--danger);
+}
+
+.btn-icon-danger:hover:not(:disabled) {
+  background: #f7e3e0;
+  color: var(--danger);
 }
 
 tfoot td {
@@ -398,10 +434,4 @@ tfoot td {
 
 .settlement .modal-actions {
   justify-content: center;
-}
-
-@media (max-width: 420px) {
-  .round-col .round-actions {
-    flex-direction: column;
-  }
 }
