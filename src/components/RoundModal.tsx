@@ -47,7 +47,7 @@ export default function RoundModal({ players, round, roundNumber, onSubmit, onCl
             <label htmlFor={`score-${p.id}`}>{p.name}</label>
             <input
               id={`score-${p.id}`}
-              type="number"
+              type="text"
               inputMode="numeric"
               value={values[p.id]}
               placeholder="ניקוד"
