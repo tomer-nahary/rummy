@@ -430,6 +430,15 @@ tfoot td {
   background: #faf8f3;
 }
 
+.payments-list li.group-separator {
+  border: none;
+  border-top: 2px dashed #b0a48e;
+  border-radius: 0;
+  background: none;
+  margin: 14px 24px;
+  padding: 0;
+}
+
 .payment-amount {
   font-weight: 600;
   color: var(--primary-dark);

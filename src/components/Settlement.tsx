@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import type { GameState } from '../types'
 import {
   computeSummaries,
@@ -31,16 +32,23 @@ export default function Settlement({ state, onReturnToGame, onNewGame }: Props) 
         <>
           <h3>מי משלם למי</h3>
           <ul className="payments-list">
-            {payments.map((p, i) => (
-              <li key={i}>
-                <span className="payment-line">
-                  <b>{nameOf(p.fromId)}</b> משלם ל<b>{nameOf(p.toId)}</b>
-                </span>
-                <span className="payment-amount">
-                  {p.points} נק&apos; ({formatNisRounded(p.points)})
-                </span>
-              </li>
-            ))}
+            {payments.map((p, i) => {
+              const isGroupEnd =
+                i < payments.length - 1 && payments[i + 1].fromId !== p.fromId
+              return (
+                <Fragment key={i}>
+                  <li>
+                    <span className="payment-line">
+                      <b>{nameOf(p.fromId)}</b> משלם ל<b>{nameOf(p.toId)}</b>
+                    </span>
+                    <span className="payment-amount">
+                      {p.points} נק&apos; ({formatNisRounded(p.points)})
+                    </span>
+                  </li>
+                  {isGroupEnd && <li className="group-separator" aria-hidden="true" />}
+                </Fragment>
+              )
+            })}
           </ul>
         </>
       )}
