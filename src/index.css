@@ -296,22 +296,26 @@ tbody tr:last-child td {
 
 .round-col {
   min-width: 0;
+  width: 22%;
+  white-space: nowrap;
 }
 
 .round-cell {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 9px;
 }
 
 .round-col .round-num {
   font-weight: 600;
   color: var(--primary-dark);
+  min-width: 14px;
+  text-align: center;
 }
 
 .btn-icon {
   background: transparent;
-  padding: 4px;
+  padding: 3px;
   color: var(--muted);
   border-radius: 6px;
   line-height: 0;
