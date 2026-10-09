@@ -54,9 +54,11 @@ export function computeBalances(players: Player[], rounds: Round[]): Map<string,
 
 // Higher points = worse: each player pays every player with fewer points
 // the difference between their totals.
+// Ordered by payer: the person who pays the most people first, all of his
+// payments grouped together (ties broken by total amount paid).
 export function computePayments(players: Player[], rounds: Round[]): Payment[] {
   const balances = computeBalances(players, rounds)
-  const payments: Payment[] = []
+  const byPayer = new Map<string, Payment[]>()
   for (let i = 0; i < players.length; i++) {
     for (let j = i + 1; j < players.length; j++) {
       const a = players[i]
@@ -65,10 +67,23 @@ export function computePayments(players: Player[], rounds: Round[]): Payment[] {
       if (diff === 0) continue
       const worse = diff > 0 ? a : b
       const better = diff > 0 ? b : a
-      payments.push({ fromId: worse.id, toId: better.id, points: Math.abs(diff) })
+      const payment: Payment = { fromId: worse.id, toId: better.id, points: Math.abs(diff) }
+      const list = byPayer.get(worse.id) ?? []
+      list.push(payment)
+      byPayer.set(worse.id, list)
     }
   }
-  return payments.sort((x, y) => y.points - x.points)
+  const payerGroups = [...byPayer.values()].sort((x, y) => {
+    const countDiff = y.length - x.length
+    if (countDiff !== 0) return countDiff
+    return (
+      y.reduce((s, p) => s + p.points, 0) - x.reduce((s, p) => s + p.points, 0)
+    )
+  })
+  for (const group of payerGroups) {
+    group.sort((x, y) => y.points - x.points)
+  }
+  return payerGroups.flat()
 }
 
 export function computeSummaries(
